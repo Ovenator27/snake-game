@@ -85,7 +85,7 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
     const handleAppleCollision = (newSnake) => {
       const snakeHead = newSnake[0];
 
-      if (snakeHead.x == apple.x && snakeHead.y == apple.y) {
+      if (snakeHead.x === apple.x && snakeHead.y === apple.y) {
         setScore(() => {
           const newScore = score + 1;
           return newScore;
@@ -99,7 +99,8 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
             Math.floor((Math.random() * canvas.height) / SNAKE_SPEED) *
             SNAKE_SPEED,
         });
-
+        
+        console.log(newSnake[newSnake.length-1]);
         newSnake.push({
           x: newSnake[newSnake.length - 1],
           y: newSnake[newSnake.length - 1],
@@ -137,7 +138,7 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
       drawSnake();
       drawApple();
       moveSnake();
-    }, 5000);
+    }, 100);
 
     return () => {
       clearInterval(interval);
