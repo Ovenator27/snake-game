@@ -43,7 +43,7 @@ const GameState = () => {
         <div>
           <p>
             Game Over!{" "}
-            {collision === "wall" ? "You Hit the wall" : "You are yourself"}!
+            {collision === "wall" ? "You Hit the wall" : "You ate yourself"}!
           </p>
           <p>Please press enter to restart the game</p>
         </div>

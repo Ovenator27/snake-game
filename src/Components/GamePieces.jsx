@@ -3,10 +3,15 @@ import { useEffect, useRef, useState } from "react";
 const GamePieces = ({ score, setScore, onGameOver }) => {
   const canvasRef = useRef();
   const SNAKE_SPEED = 20;
-  const [apple, setApple] = useState({ x: 180, y: 100 });
+  const columns = 600;
+  const rows = 600;
+  const [apple, setApple] = useState({
+    x: Math.floor((Math.random() * columns) / SNAKE_SPEED) * SNAKE_SPEED + 10,
+    y: Math.floor((Math.random() * rows) / SNAKE_SPEED) * SNAKE_SPEED + 10,
+  });
   const [snake, setSnake] = useState([
-    { x: 100, y: 60 },
-    { x: 80, y: 60 },
+    { x: 30, y: 10 },
+    { x: 10, y: 10 },
   ]);
   const [direction, setDirection] = useState(null);
 
@@ -15,10 +20,14 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
     const ctx = canvas.getContext("2d");
 
     const drawSnake = () => {
-      snake.forEach((snakePart) => {
+      snake.forEach((snakePart, index) => {
         ctx.beginPath();
-        ctx.rect(snakePart.x, snakePart.y, 20, 20);
-        ctx.fillStyle = "#90EE90";
+        ctx.arc(snakePart.x, snakePart.y, 10, 0, 2 * Math.PI);
+        if (index === snake.length - 1) {
+          ctx.fillStyle = "#FF0000";
+        } else {
+          ctx.fillStyle = "#90EE90";
+        }
         ctx.fill();
         ctx.closePath();
       });
@@ -26,7 +35,7 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
 
     const drawApple = () => {
       ctx.beginPath();
-      ctx.rect(apple.x, apple.y, 20, 20);
+      ctx.arc(apple.x, apple.y, 10, 0, 2 * Math.PI);
       ctx.fillStyle = "#FF0000";
       ctx.fill();
       ctx.closePath();
@@ -67,6 +76,7 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
           newSnake[0] = snakeHead;
           handleAppleCollision(newSnake);
           handleWallCollision(snakeHead);
+          handleBodyCollision(newSnake);
 
           return newSnake;
         });
@@ -74,10 +84,10 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
     };
 
     const handleWallCollision = (snakeHead) => {
-      if (snakeHead.x > canvas.width || snakeHead.x + SNAKE_SPEED < 0) {
+      if (snakeHead.x > canvas.width || snakeHead.x < 0) {
         onGameOver("wall");
       }
-      if (snakeHead.y > canvas.height || snakeHead.y + SNAKE_SPEED < 0) {
+      if (snakeHead.y > canvas.height || snakeHead.y < 0) {
         onGameOver("wall");
       }
     };
@@ -93,14 +103,11 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
 
         setApple({
           x:
-            Math.floor((Math.random() * canvas.width) / SNAKE_SPEED) *
-            SNAKE_SPEED,
+            Math.floor((Math.random() * columns) / SNAKE_SPEED) * SNAKE_SPEED +
+            10,
           y:
-            Math.floor((Math.random() * canvas.height) / SNAKE_SPEED) *
-            SNAKE_SPEED,
+            Math.floor((Math.random() * rows) / SNAKE_SPEED) * SNAKE_SPEED + 10,
         });
-        
-        console.log(newSnake[newSnake.length-1]);
         newSnake.push({
           x: newSnake[newSnake.length - 1],
           y: newSnake[newSnake.length - 1],
@@ -108,26 +115,12 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
       }
     };
 
-    const handleKeyPress = (e) => {
-      switch (e.key) {
-        case "ArrowRight":
-          setDirection("right");
-          break;
-
-        case "ArrowLeft":
-          setDirection("left");
-          break;
-
-        case "ArrowDown":
-          setDirection("down");
-          break;
-
-        case "ArrowUp":
-          setDirection("up");
-          break;
-
-        default:
-          break;
+    const handleBodyCollision = (newSnake) => {
+      const snakeHead = newSnake[0];
+      for (let i = 1; i < newSnake.length; i++) {
+        if (snakeHead.x === newSnake[i].x && snakeHead.y === newSnake[i].y) {
+          onGameOver("body");
+        }
       }
     };
 
@@ -145,9 +138,56 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
     };
   }, [snake, direction]);
 
+  const handleKeyPress = (e) => {
+    setDirection((prevDirection) => {
+      console.log(prevDirection);
+      let newDirection = null;
+      if (e.key === "ArrowRight" && prevDirection !== "left") {
+        return (newDirection = "right");
+      }
+      else if (e.key === "ArrowLeft" && prevDirection !== "right") {
+        return (newDirection = "left");
+      }
+      else if (e.key === "ArrowUp" && prevDirection !== "down") {
+        return (newDirection = "up");
+      }
+      else if (e.key === "ArrowDown" && prevDirection !== "up") {
+        return (newDirection = "down");
+      }
+      else {
+        return prevDirection
+      }
+    });
+    // switch (true) {
+    //   case e.key === "ArrowRight" && direction !== "left":
+    //     setDirection("right");
+    //     break;
+
+    //   case e.key === "ArrowLeft" && direction !== "right":
+    //     setDirection("left");
+    //     break;
+
+    //   case e.key === "ArrowDown" && direction !== "up":
+    //     setDirection("down");
+    //     break;
+
+    //   case e.key === "ArrowUp" && direction !== "down":
+    //     setDirection("up");
+    //     break;
+
+    //   default:
+    //     break;
+    // }
+  };
+
   return (
     <div>
-      <canvas className="gameCanvas" ref={canvasRef} width={600} height={600} />
+      <canvas
+        className="gameCanvas"
+        ref={canvasRef}
+        width={columns}
+        height={rows}
+      />
     </div>
   );
 };
