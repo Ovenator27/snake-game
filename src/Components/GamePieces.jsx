@@ -10,6 +10,7 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
     y: Math.floor((Math.random() * rows) / SNAKE_SPEED) * SNAKE_SPEED + 10,
   });
   const [snake, setSnake] = useState([
+    { x: 50, y: 10 },
     { x: 30, y: 10 },
     { x: 10, y: 10 },
   ]);
@@ -23,7 +24,7 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
       snake.forEach((snakePart, index) => {
         ctx.beginPath();
         ctx.arc(snakePart.x, snakePart.y, 10, 0, 2 * Math.PI);
-        if (index === snake.length - 1) {
+        if (index === 0) {
           ctx.fillStyle = "#FF0000";
         } else {
           ctx.fillStyle = "#90EE90";
@@ -48,8 +49,7 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
           const snakeHead = { x: newSnake[0].x, y: newSnake[0].y };
 
           for (let i = newSnake.length - 1; i > 0; i--) {
-            newSnake[i].x = newSnake[i - 1].x;
-            newSnake[i].y = newSnake[i - 1].y;
+            newSnake[i] = newSnake[i - 1];
           }
 
           switch (direction) {
@@ -77,19 +77,24 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
           handleAppleCollision(newSnake);
           handleWallCollision(snakeHead);
           handleBodyCollision(newSnake);
-
           return newSnake;
         });
       }
     };
-
-    const handleWallCollision = (snakeHead) => {
-      if (snakeHead.x > canvas.width || snakeHead.x < 0) {
-        onGameOver("wall");
-      }
-      if (snakeHead.y > canvas.height || snakeHead.y < 0) {
-        onGameOver("wall");
-      }
+    const handleKeyPress = (e) => {
+      setDirection((prevDirection) => {
+        if (e.key === "ArrowRight" && prevDirection !== "left") {
+          return "right";
+        } else if (e.key === "ArrowLeft" && prevDirection !== "right") {
+          return "left";
+        } else if (e.key === "ArrowUp" && prevDirection !== "down") {
+          return "up";
+        } else if (e.key === "ArrowDown" && prevDirection !== "up") {
+          return "down";
+        } else {
+          return prevDirection;
+        }
+      });
     };
 
     const handleAppleCollision = (newSnake) => {
@@ -123,6 +128,14 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
         }
       }
     };
+    const handleWallCollision = (snakeHead) => {
+      if (snakeHead.x > canvas.width || snakeHead.x < 0) {
+        onGameOver("wall");
+      }
+      if (snakeHead.y > canvas.height || snakeHead.y < 0) {
+        onGameOver("wall");
+      }
+    };
 
     window.addEventListener("keydown", handleKeyPress);
 
@@ -136,49 +149,7 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
     return () => {
       clearInterval(interval);
     };
-  }, [snake, direction]);
-
-  const handleKeyPress = (e) => {
-    setDirection((prevDirection) => {
-      console.log(prevDirection);
-      let newDirection = null;
-      if (e.key === "ArrowRight" && prevDirection !== "left") {
-        return (newDirection = "right");
-      }
-      else if (e.key === "ArrowLeft" && prevDirection !== "right") {
-        return (newDirection = "left");
-      }
-      else if (e.key === "ArrowUp" && prevDirection !== "down") {
-        return (newDirection = "up");
-      }
-      else if (e.key === "ArrowDown" && prevDirection !== "up") {
-        return (newDirection = "down");
-      }
-      else {
-        return prevDirection
-      }
-    });
-    // switch (true) {
-    //   case e.key === "ArrowRight" && direction !== "left":
-    //     setDirection("right");
-    //     break;
-
-    //   case e.key === "ArrowLeft" && direction !== "right":
-    //     setDirection("left");
-    //     break;
-
-    //   case e.key === "ArrowDown" && direction !== "up":
-    //     setDirection("down");
-    //     break;
-
-    //   case e.key === "ArrowUp" && direction !== "down":
-    //     setDirection("up");
-    //     break;
-
-    //   default:
-    //     break;
-    // }
-  };
+  }, [snake, direction, apple.x, apple.y, onGameOver, score, setScore]);
 
   return (
     <div>
