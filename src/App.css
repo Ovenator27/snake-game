@@ -1,4 +1,8 @@
+body {
+    text-align: center;
+}
+
 .gameCanvas {
-    background-color: gray;
-    border: 3px solid lightgray;
+  background-color:lightgray;
+  border: 3px solid darkgray;
 }

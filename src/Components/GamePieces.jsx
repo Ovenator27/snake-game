@@ -10,9 +10,9 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
     y: Math.floor((Math.random() * rows) / SNAKE_SPEED) * SNAKE_SPEED + 10,
   });
   const [snake, setSnake] = useState([
-    { x: 50, y: 10 },
-    { x: 30, y: 10 },
-    { x: 10, y: 10 },
+    { x: 150, y: 70 },
+    { x: 130, y: 70 },
+    { x: 110, y: 70 },
   ]);
   const [direction, setDirection] = useState(null);
 
@@ -25,9 +25,9 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
         ctx.beginPath();
         ctx.arc(snakePart.x, snakePart.y, 10, 0, 2 * Math.PI);
         if (index === 0) {
-          ctx.fillStyle = "#FF0000";
+          ctx.fillStyle = "#004000";
         } else {
-          ctx.fillStyle = "#90EE90";
+          ctx.fillStyle = "#008000";
         }
         ctx.fill();
         ctx.closePath();
@@ -83,13 +83,25 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
     };
     const handleKeyPress = (e) => {
       setDirection((prevDirection) => {
-        if (e.key === "ArrowRight" && prevDirection !== "left") {
+        if (
+          (e.key === "ArrowRight" || e.key === "d") &&
+          prevDirection !== "left"
+        ) {
           return "right";
-        } else if (e.key === "ArrowLeft" && prevDirection !== "right") {
+        } else if (
+          (e.key === "ArrowLeft" || e.key === "a") &&
+          prevDirection !== "right"
+        ) {
           return "left";
-        } else if (e.key === "ArrowUp" && prevDirection !== "down") {
+        } else if (
+          (e.key === "ArrowUp" || e.key === "w") &&
+          prevDirection !== "down"
+        ) {
           return "up";
-        } else if (e.key === "ArrowDown" && prevDirection !== "up") {
+        } else if (
+          (e.key === "ArrowDown" || e.key === "s") &&
+          prevDirection !== "up"
+        ) {
           return "down";
         } else {
           return prevDirection;
@@ -129,10 +141,12 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
       }
     };
     const handleWallCollision = (snakeHead) => {
-      if (snakeHead.x > canvas.width || snakeHead.x < 0) {
-        onGameOver("wall");
-      }
-      if (snakeHead.y > canvas.height || snakeHead.y < 0) {
+      if (
+        snakeHead.x > canvas.width ||
+        snakeHead.x < 0 ||
+        snakeHead.y > canvas.height ||
+        snakeHead.y < 0
+      ) {
         onGameOver("wall");
       }
     };
@@ -144,7 +158,7 @@ const GamePieces = ({ score, setScore, onGameOver }) => {
       drawSnake();
       drawApple();
       moveSnake();
-    }, 100);
+    }, 75);
 
     return () => {
       clearInterval(interval);
